@@ -23,7 +23,8 @@ import matplotlib.pyplot as plt
 
 
 #Dataset
-classification_df = pd.read_csv("dataset/iris.csv")
+data_url = "dataset/iris.csv"
+classification_df = pd.read_csv(data_url)
 # regression_df = pd.read_csv("dataset/california_housing_train.csv")
 # clustering_df = pd.read_csv("dataset/Mall_Customers.csv")
 
@@ -36,12 +37,14 @@ classification_df = pd.read_csv("dataset/iris.csv")
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-SPLIT_RATIO = 0.8
+# SPLIT_RATIO = 0.8
+processed_features = ['sepal length', 'sepal width', 'petal length', 'petal width']
+target = ['species']
 
-X = classification_df[['sepal length', 'sepal width', 'petal length', 'petal width']].values
-y = classification_df[['species']].values
+X = classification_df[processed_features].values
+y = classification_df[target].values
 class_name = classification_df.species.unique().tolist()
-feature_name = classification_df.columns[:-1].tolist()
+feature_names = classification_df.columns[:-1].tolist()
 # X_train, X_valid, y_train, y_valid= train_test_split(X, y, test_size=SPLIT_RATIO, shuffle=False)
 
 
@@ -66,16 +69,20 @@ clf_report = classification_report(y, result, output_dict=True)
 
 
 #Interpretation
+'''
 from sklearn.inspection import permutation_importance, partial_dependence
 
 feature_importance = permutation_importance(clf_model, X, y, scoring='accuracy')
 fi_socre = feature_importance.importances_mean.tolist()
 fi_socre = [round(score, 3) for score in fi_socre]
 
+pdp = {}
+axes = {}
+
+for i in range(len(feature_names)):
+    pdp[i], axes[i] = partial_dependence(clf_model, X=classification_df[feature_names], features=feature_names[i])
+
 '''
-*Partial Dependency function from sklearn not support for multiclass classification case
-'''
-# pdp, axes = partial_dependence(clf_model, classification_df[feature_name])
 
 #Visualize
 
@@ -93,15 +100,18 @@ st.table(pd.DataFrame(clf_report))
 
 st.header('Interpretation :')
 
-from function import feature_importance_plot
-pi_plot =  feature_importance_plot(feature_name, fi_socre)
+'''
+from utils.plotting import feature_importance_plot
+
+pi_plot =  feature_importance_plot(fi_score)
 
 st_echarts(pi_plot)
 
-from function import auc_plot
+from utils.plotting import auc_plot
 auc_roc_plot = auc_plot(class_name, y, result_proba)
 
 st_echarts(auc_roc_plot)
+'''
 
 
 

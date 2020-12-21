@@ -12,7 +12,7 @@ import streamlit as st
 #Machine Learning 
 import sklearn
 import pandas as pd
-# from utils.file_management import file_selector
+# from utils.file_management import cache_dataset
 # import numpy as np
 # import matplotlib.pyplot as plt
 
@@ -20,21 +20,26 @@ import pandas as pd
 # from sklearn.preprocessing import StandardScaler
 # from sklearn.model_selection import train_test_split
 
-
-def get_data():
+def get_dataset():
     #Import Dataset
+    dataset_df = pd.DataFrame()
+    dataset_column = []
+
     csv_file_bytes = st.file_uploader("Upload a file (csv format)", type=("csv"), accept_multiple_files=False)
     if csv_file_bytes:
+        # dataset_df = cache_dataset(csv_file_bytes)
         dataset_df = pd.read_csv(csv_file_bytes)
-        st.subheader(f'{csv_file_bytes.name} Dataset')
+        dataset_name = csv_file_bytes.name.replace(".csv","")
+        st.subheader(f'{dataset_name} Data set')
+        dataset_column = dataset_df.columns.tolist()
 
-        selected_features = st.multiselect("Choose Features as predictor : ", list(dataset_df.columns), list(dataset_df.columns))
-        if not selected_features:
-            st.error("Please select at least one feature")
 
         st.dataframe(dataset_df)
     else:
         st.error("Please upload proper csv format file")
+
+
+    return dataset_df, dataset_column
     
 
 

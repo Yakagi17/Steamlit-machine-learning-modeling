@@ -80,7 +80,7 @@ def auc_plot(class_name, auc_score, auc_roc):
         'legend': {
             'top': 'top',
             'data': class_name,
-            'top':'bottom'
+            # 'top':'bottom'
             },
         'xAxis': {
             'name': 'False Positive Rate',

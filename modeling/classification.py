@@ -20,7 +20,7 @@ from sklearn.inspection import partial_dependence, permutation_importance
 from utils.preprocessing import classEncoder
 
 
-class KNNClassifer:
+class KNN_Classifer:
     def __init__(self, k_neighbors=5):
         self.k_neighbors = k_neighbors
         self.classifier = KNeighborsClassifier(n_neighbors=self.k_neighbors)
@@ -35,36 +35,43 @@ class KNNClassifer:
     
     def metircs_model(self, y, y_pred, class_name):
         #Model Accuracy
-        accuracy = round(accuracy_score(y, y_pred), 2)
+        accuracy = round(accuracy_score(y, y_pred), 4)
 
         #Confusion Matrix
         conf_matrix = confusion_matrix(y, y_pred) #tolist()
 
-        index = [("Predicted", index_class) for index_class in class_name]
-        columns = [("True", index_class) for index_class in class_name]
+        # index = [("Predicted", index_class) for index_class in class_name]
+        # columns = [("True", index_class) for index_class in class_name]
 
-        conf_matrix = pd.DataFrame(conf_matrix, columns=columns, index=index)
-        conf_matrix.columns = pd.MultiIndex.from_tuples(conf_matrix.columns)
+        conf_matrix = pd.DataFrame(conf_matrix, columns=[["True"]*3, class_name], index=[["Predicted"]*3, class_name])
+        # conf_matrix.columns = pd.MultiIndex.from_tuples(conf_matrix.columns)
 
         #Classification Report
         clf_report = classification_report(y, y_pred, output_dict=True)
 
         #F1 Score
         if len(class_name) > 2:
-            f1score = round(f1_score(y, y_pred, average='weighted'), 2)
+            f1score = round(f1_score(y, y_pred, average='weighted'), 4)
         else:
-            f1score = round(f1_score(y, y_pred, average='binary'),2)
+            f1score = round(f1_score(y, y_pred, average='binary'),4)
 
-        roc_score = 0
-        # #AUC ROC Score
-        # y_true = np.array(y)
-        # if y_true.dtype == 'O':
-        #     y_true = classEncoder(y_true, class_name)
-
-        # roc_score = round(roc_auc_score(y_true, y_pred), 2)  
+  
+        # AUC ROC Score
+        y_true = np.array(y)
+        y_pred = np.array(y_pred)
         
+        #Check if y_true type is object
+        if y_true.dtype == 'O':
+            y_true = classEncoder(y_true, class_name)
 
-        #Mapping Confusion Matrix
+        if y_pred.dtype == 'O':
+            y_pred = classEncoder(y_pred, class_name)
+
+        try:
+            roc_score = round(roc_auc_score(y_true, y_pred), 4)  
+        except:
+            roc_score = ("Error, ROC AUC Score couldn't be calculated")
+        # Mapping Confusion Matrix
 
 
         return accuracy, f1score, roc_score, conf_matrix, clf_report
@@ -81,7 +88,7 @@ class KNNClassifer:
 
         return fi_socre
     
-class SVMClassifer:
+class SVM_Classifier:
     def __init__(self, C=1, kernel='rbf', degree=1, gamma=1.0, coef0=0.0):
         self.C = C
         self.kernel = kernel
@@ -98,14 +105,62 @@ class SVMClassifer:
 
         return y_pred, y_proba
     
-    def metircs_model(self, y, y_pred):
-        accuracy = round(accuracy_score(y, y_pred), 2)
-        conf_matrix = confusion_matrix(y, y_pred) #tolist()
-        clf_report = classification_report(y, y_pred, output_dict=True)
-        
-        return accuracy, conf_matrix, clf_report
+    def metircs_model(self, y, y_pred, class_name):
+        #Model Accuracy
+        accuracy = round(accuracy_score(y, y_pred), 4)
 
-class MLPClassifer:
+        #Confusion Matrix
+        conf_matrix = confusion_matrix(y, y_pred) #tolist()
+
+        # index = [("Predicted", index_class) for index_class in class_name]
+        # columns = [("True", index_class) for index_class in class_name]
+
+        conf_matrix = pd.DataFrame(conf_matrix, columns=[["True"]*3, class_name], index=[["Predicted"]*3, class_name])
+        # conf_matrix.columns = pd.MultiIndex.from_tuples(conf_matrix.columns)
+
+        #Classification Report
+        clf_report = classification_report(y, y_pred, output_dict=True)
+
+        #F1 Score
+        if len(class_name) > 2:
+            f1score = round(f1_score(y, y_pred, average='weighted'), 4)
+        else:
+            f1score = round(f1_score(y, y_pred, average='binary'),4)
+
+  
+        # AUC ROC Score
+        y_true = np.array(y)
+        y_pred = np.array(y_pred)
+        
+        #Check if y_true type is object
+        if y_true.dtype == 'O':
+            y_true = classEncoder(y_true, class_name)
+
+        if y_pred.dtype == 'O':
+            y_pred = classEncoder(y_pred, class_name)
+
+        try:
+            roc_score = round(roc_auc_score(y_true, y_pred), 4)  
+        except:
+            roc_score = ("Error, ROC AUC Score couldn't be calculated")
+        # Mapping Confusion Matrix
+
+
+        return accuracy, f1score, roc_score, conf_matrix, clf_report
+
+    def feature_importance(self, X, y, features_name):
+        #Calculate permutation importance score for each feature
+        fi = permutation_importance(self.classifier, X, y, scoring='accuracy')
+        fi_socre = fi.importances_mean.tolist()
+        fi_socre = [round(score, 3) for score in fi_socre]
+
+        #Zip and sort feature importance
+        zip_fi = zip(features_name, fi_socre)
+        fi_socre = sorted(zip_fi, key=lambda x:x[1], reverse=False)
+
+        return fi_socre
+
+class MLP_Classifer:
     def __init__(self, hidden_layer_sizes=(100,) ,activation='relu', solver='adam', alpha=0.0001, learning_rate_init=0.001, max_iter=200, early_stopping=False):
         self.hidden_layer_sizes = hidden_layer_sizes
         self.activation = activation
@@ -124,9 +179,57 @@ class MLPClassifer:
 
         return y_pred, y_proba
     
-    def metircs_model(self, y, y_pred):
-        accuracy = round(accuracy_score(y, y_pred), 2)
+    def metircs_model(self, y, y_pred, class_name):
+        #Model Accuracy
+        accuracy = round(accuracy_score(y, y_pred), 4)
+
+        #Confusion Matrix
         conf_matrix = confusion_matrix(y, y_pred) #tolist()
+
+        # index = [("Predicted", index_class) for index_class in class_name]
+        # columns = [("True", index_class) for index_class in class_name]
+
+        conf_matrix = pd.DataFrame(conf_matrix, columns=[["True"]*3, class_name], index=[["Predicted"]*3, class_name])
+        # conf_matrix.columns = pd.MultiIndex.from_tuples(conf_matrix.columns)
+
+        #Classification Report
         clf_report = classification_report(y, y_pred, output_dict=True)
+
+        #F1 Score
+        if len(class_name) > 2:
+            f1score = round(f1_score(y, y_pred, average='weighted'), 4)
+        else:
+            f1score = round(f1_score(y, y_pred, average='binary'),4)
+
+  
+        # AUC ROC Score
+        y_true = np.array(y)
+        y_pred = np.array(y_pred)
         
-        return accuracy, conf_matrix, clf_report
+        #Check if y_true type is object
+        if y_true.dtype == 'O':
+            y_true = classEncoder(y_true, class_name)
+
+        if y_pred.dtype == 'O':
+            y_pred = classEncoder(y_pred, class_name)
+
+        try:
+            roc_score = round(roc_auc_score(y_true, y_pred), 4)  
+        except:
+            roc_score = ("Error, ROC AUC Score couldn't be calculated")
+        # Mapping Confusion Matrix
+
+
+        return accuracy, f1score, roc_score, conf_matrix, clf_report
+
+    def feature_importance(self, X, y, features_name):
+        #Calculate permutation importance score for each feature
+        fi = permutation_importance(self.classifier, X, y, scoring='accuracy')
+        fi_socre = fi.importances_mean.tolist()
+        fi_socre = [round(score, 3) for score in fi_socre]
+
+        #Zip and sort feature importance
+        zip_fi = zip(features_name, fi_socre)
+        fi_socre = sorted(zip_fi, key=lambda x:x[1], reverse=False)
+
+        return fi_socre

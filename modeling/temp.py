@@ -24,8 +24,9 @@ def get_dataset():
     #Import Dataset
     dataset_df = pd.DataFrame()
     dataset_column = []
-
+    
     csv_file_bytes = st.file_uploader("Upload a file (csv format)", type=("csv"), accept_multiple_files=False)
+    
     if csv_file_bytes:
         # dataset_df = cache_dataset(csv_file_bytes)
         dataset_df = pd.read_csv(csv_file_bytes)
@@ -36,7 +37,8 @@ def get_dataset():
 
         st.dataframe(dataset_df)
     else:
-        st.error("Please upload proper csv format file")
+        st.success("Please upload dataset")
+    #     st.error("Please upload proper csv format file")
 
 
     return dataset_df, dataset_column

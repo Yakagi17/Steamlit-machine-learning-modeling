@@ -110,6 +110,37 @@ def auc_plot(class_name, auc_score, auc_roc):
 def partial_dependence_plot(axes, pdp):
     pass
 
-def coordinates_plot():
-    pass
+def coordinates_plot(centroid_df, selected_features, num_cluster):
+    data_per_cluster = {}
+    series_data = []
+    parallel_axis_name = []
+
+    for i in range(num_cluster):
+        data_per_cluster[i] = centroid_df[centroid_df['cluster'] == i].values.tolist()
+        temp_series_format = {"name": f"Cluster - {i}", "type": "parallel", "lineStyle": "lineStyle", "data": data_per_cluster[i]}
+        series_data.append(temp_series_format)
     
+    for i in range(len(selected_features)):
+        temp_parallel_axis_format = {"dim": i, "name": selected_features[i]}
+        parallel_axis_name.append(temp_parallel_axis_format)
+    
+    legend = {
+        "top": 30,
+        "data": selected_features,
+        "itemGap": 20,
+        "textStyle": {
+            "color": '#fff',
+            "fontSize": 14
+            }
+        }
+
+    options = {
+        "legend" : legend,
+        "parallelAxis": parallel_axis_name,
+        "series": series_data
+    }
+
+    return options
+    
+def cluster_data_coordinates_plot():
+    pass

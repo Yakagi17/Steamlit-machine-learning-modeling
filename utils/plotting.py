@@ -114,29 +114,64 @@ def coordinates_plot(centroid_df, selected_features, num_cluster):
     data_per_cluster = {}
     series_data = []
     parallel_axis_name = []
+    # schema = []
+
 
     for i in range(num_cluster):
         data_per_cluster[i] = centroid_df[centroid_df['cluster'] == i].values.tolist()
-        temp_series_format = {"name": f"Cluster - {i}", "type": "parallel", "lineStyle": "lineStyle", "data": data_per_cluster[i]}
+        temp_series_format = {"name": f"Cluster - {i}", "type": "parallel", "data": data_per_cluster[i]}
         series_data.append(temp_series_format)
     
     for i in range(len(selected_features)):
+        #Add Parallel Axes features
         temp_parallel_axis_format = {"dim": i, "name": selected_features[i]}
         parallel_axis_name.append(temp_parallel_axis_format)
-    
+
     legend = {
-        "top": 30,
-        "data": selected_features,
+        "bottom": 30,
+        "data": [f"Cluster - {i}" for i in range(num_cluster)],
         "itemGap": 20,
         "textStyle": {
             "color": '#fff',
             "fontSize": 14
             }
         }
+    
+    parallel_options = {
+        "bottom": 100,
+        "parallelAxisDefault": {
+            "type": 'value',
+            "nameLocation": 'end',
+            "nameGap": 20,
+            "nameTextStyle": {
+                "color": '#fff',
+                "fontSize": 12
+            },
+            "axisLine": {
+                "lineStyle": {
+                    "color": '#aaa'
+                }
+            },
+            "axisTick": {
+                "lineStyle": {
+                    "color": '#777'
+                }
+            },
+            "splitLine": {
+                "show": "false"
+            },
+            "axisLabel": {
+                "color": '#fff'
+            }
+        }
+    }
+
 
     options = {
-        "legend" : legend,
+        "backgroundColor": '#333',
+        "legend": legend,
         "parallelAxis": parallel_axis_name,
+        "parallel": parallel_options,
         "series": series_data
     }
 

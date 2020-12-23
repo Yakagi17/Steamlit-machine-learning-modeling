@@ -410,9 +410,6 @@ def clustering_modeling(dataset_df, dataset_column):
             cluster_data_options = coordinates_plot(clusteer_data_point_df, selected_features, num_cluster=k_clusters)
             st_echarts(cluster_data_options)
 
-            st.write(centroid_options)
-
-
         else:
             st.sidebar.error("Please fill all method parameter")
 

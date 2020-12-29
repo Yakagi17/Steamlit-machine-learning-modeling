@@ -17,7 +17,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.inspection import partial_dependence, permutation_importance
 
 #Utils
-from utils.preprocessing import classEncoder
+from utils.preprocessing import class_encoder
 
 
 class KNN_Regression:
@@ -25,28 +25,28 @@ class KNN_Regression:
         self.k_neighbors = k_neighbors
         self.regression = KNeighborsRegressor(n_neighbors=self.k_neighbors)
     
-    def modeling(self, X, y):
-        self.regression.fit(X, y)
+    def modeling(self, X_train, X_valid, y_train):
+        self.regression.fit(X_train, y_train)
         
-        y_pred = self.regression.predict(X)
+        y_pred = self.regression.predict(X_valid)
 
         return y_pred
     
-    def metircs_model(self, y, y_pred, class_name):
+    def metircs_model(self, y_valid, y_pred, class_name):
         #RMSE
-        rmse = np.sqrt(mean_squared_error(y, y_pred))
+        rmse = np.sqrt(mean_squared_error(y_valid, y_pred))
 
         #MAE
-        mae = mean_absolute_error(y, y_pred)
+        mae = mean_absolute_error(y_valid, y_pred)
 
         #R Squared
-        r2 = r2_score(y, y_pred)
+        r2 = r2_score(y_valid, y_pred)
 
         return rmse, mae, r2
 
-    def feature_importance(self, X, y, features_name):
+    def feature_importance(self, X_valid, y_valid, features_name):
         #Calculate permutation importance score for each feature
-        fi = permutation_importance(self.regression, X, y)
+        fi = permutation_importance(self.regression, X_valid, y_valid)
         fi_socre = fi.importances_mean.tolist()
         fi_socre = [round(score, 3) for score in fi_socre]
 
@@ -65,28 +65,28 @@ class SVM_Regression:
         self.coef0= coef0
         self.regression = SVR(C=self.C, kernel=self.kernel, degree=self.degree, gamma=self.gamma, coef0=self.coef0)
     
-    def modeling(self, X, y):
-        self.regression.fit(X, y)
+    def modeling(self, X_train, X_valid, y_train):
+        self.regression.fit(X_train, y_train)
         
-        y_pred = self.regression.predict(X)
+        y_pred = self.regression.predict(X_valid)
 
         return y_pred
     
-    def metircs_model(self, y, y_pred, class_name):
+    def metircs_model(self, y_valid, y_pred, class_name):
         #RMSE
-        rmse = np.sqrt(mean_squared_error(y, y_pred))
+        rmse = np.sqrt(mean_squared_error(y_valid, y_pred))
 
         #MAE
-        mae = mean_absolute_error(y, y_pred)
+        mae = mean_absolute_error(y_valid, y_pred)
 
         #R Squared
-        r2 = r2_score(y, y_pred)
+        r2 = r2_score(y_valid, y_pred)
 
         return rmse, mae, r2
 
-    def feature_importance(self, X, y, features_name):
+    def feature_importance(self, X_valid, y_valid, features_name):
         #Calculate permutation importance score for each feature
-        fi = permutation_importance(self.regression, X, y)
+        fi = permutation_importance(self.regression, X_valid, y_valid)
         fi_socre = fi.importances_mean.tolist()
         fi_socre = [round(score, 3) for score in fi_socre]
 
@@ -107,28 +107,28 @@ class MLP_Regression:
         self.early_stopping = early_stopping
         self.regression = MLPRegressor(hidden_layer_sizes=self.hidden_layer_sizes, activation=self.activation, solver=self.solver, alpha=self.alpha, learning_rate_init=self.learning_rate_init, max_iter=self.max_iter, early_stopping=self.early_stopping)
     
-    def modeling(self, X, y):
-        self.regression.fit(X, y)
+    def modeling(self, X_train, X_valid, y_train):
+        self.regression.fit(X_train, y_train)
         
-        y_pred = self.regression.predict(X)
+        y_pred = self.regression.predict(X_valid)
 
         return y_pred
     
-    def metircs_model(self, y, y_pred, class_name):
+    def metircs_model(self, y_valid, y_pred, class_name):
         #RMSE
-        rmse = np.sqrt(mean_squared_error(y, y_pred))
+        rmse = np.sqrt(mean_squared_error(y_valid, y_pred))
 
         #MAE
-        mae = mean_absolute_error(y, y_pred)
+        mae = mean_absolute_error(y_valid, y_pred)
 
         #R Squared
-        r2 = r2_score(y, y_pred)
+        r2 = r2_score(y_valid, y_pred)
 
         return rmse, mae, r2
 
-    def feature_importance(self, X, y, features_name):
+    def feature_importance(self, X_valid, y_valid, features_name):
         #Calculate permutation importance score for each feature
-        fi = permutation_importance(self.regression, X, y)
+        fi = permutation_importance(self.regression, X_valid, y_valid)
         fi_socre = fi.importances_mean.tolist()
         fi_socre = [round(score, 3) for score in fi_socre]
 

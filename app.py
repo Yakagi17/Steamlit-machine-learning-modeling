@@ -1,8 +1,11 @@
 import streamlit as st
-import modeling_demo
-from modeling.temp import get_dataset
+from interface.main_interface import classification_modeling, regression_modeling, clustering_modeling, startup
+from utils.data_management import get_dataset
 from streamlit.logger import get_logger
 from collections import OrderedDict
+
+#Temporary
+from utils.preprocessing import cleansing_data
 
 
 
@@ -13,10 +16,10 @@ dataset_column = []
 
 MODELING_DEMO = OrderedDict(
     [
-        ("---", modeling_demo.startup),
-        ("Classification", modeling_demo.classification_modeling),
-        ("Regression", modeling_demo.regression_modeling),
-        ("Clustering", modeling_demo.clustering_modeling),
+        ("---", startup),
+        ("Classification", classification_modeling),
+        ("Regression", regression_modeling),
+        ("Clustering", clustering_modeling),
     ])
 
 
@@ -29,7 +32,15 @@ def ml_demo_interface():
     else:
         st.markdown(f'# {modeling_demo_name}')
 
-    dataset_df, dataset_column = get_dataset()    
+    dataset_df, dataset_column = get_dataset()
+    target = st.selectbox("Choose Target column : ", dataset_df.columns.tolist())
+
+    #Cleansing dataset
+    any_dataframe = dataset_df.empty == False
+    if any_dataframe:
+        dataset_df = cleansing_data(dataset_df, target)
+        st.subheader(f'Preprocessed Dataset')
+        st.dataframe(dataset_df)
 
     if modeling_demo_name != "---" and not dataset_df.empty:
         demo_app(dataset_df, dataset_column)

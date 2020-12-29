@@ -1,6 +1,6 @@
 # import pandas as pd
 # import numpy as np
-from utils.preprocessing import classEncoder
+from utils.preprocessing import class_encoder
 
 from sklearn.metrics import roc_curve, auc
 from sklearn.inspection import partial_dependence, permutation_importance
@@ -16,7 +16,7 @@ def auc_score(class_name, y_true, y_proba):
 
     #Check if y value is String or Object type
     if y_true.dtype == 'O':
-        y_true = classEncoder(y_true, class_name)
+        y_true = class_encoder(y_true, class_name)
 
 
     #Calcluate true positif rate and false positif rate

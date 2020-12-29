@@ -1,3 +1,5 @@
+import streamlit as st
+
 import pandas as pd
 import numpy as np
 
@@ -10,7 +12,7 @@ class DataPreparation:
         self.selected_features = selected_features
         self.target = target
 
-    def data_modeling(self, shuffle_data=True):
+    def data_modeling(self, split_test_size = 0.2, shuffle_data=True):
         #Shuffle
         if shuffle_data:
             self.dataframe = shuffle(self.dataframe, random_state=42)
@@ -19,15 +21,13 @@ class DataPreparation:
             X = self.dataframe[self.selected_features]
             y = self.dataframe[self.target]
 
-            return X, y
+            X_train, X_valid, y_train, y_valid = train_test_split(X,y, test_size = split_test_size)
+
+            return X_train, X_valid, y_train, y_valid
         else:
             X = self.dataframe[self.selected_features]
 
             return X
-
-        # X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=test_size, random_state=42)
-        # return X_train, X_valid, y_train, y_valid
-
         
 
     def get_class_names(self):
@@ -48,3 +48,28 @@ class DataPreparation:
 
     def get_features_name(self):
         return self.dataframe.columns.tolist()
+    
+
+
+def get_dataset():
+    #Import Dataset
+    dataset_df = pd.DataFrame()
+    dataset_column = []
+    
+    csv_file_bytes = st.file_uploader("Upload a file (csv format)", type=("csv"), accept_multiple_files=False)
+    
+    if csv_file_bytes:
+        # dataset_df = cache_dataset(csv_file_bytes)
+        dataset_df = pd.read_csv(csv_file_bytes)
+        dataset_name = csv_file_bytes.name.replace(".csv","")
+        st.subheader(f'Raw {dataset_name} Data set')
+        dataset_column = dataset_df.columns.tolist()
+
+
+        st.dataframe(dataset_df)
+    else:
+        st.success("Please upload dataset")
+    #     st.error("Please upload proper csv format file")
+
+
+    return dataset_df, dataset_column
